@@ -10,6 +10,7 @@ const app = Vue.createApp({
             playerHealth: 100,
             roundCount: 0,
             winner: null,
+            logMessages: [],
         }
     },
 
@@ -18,12 +19,10 @@ const app = Vue.createApp({
 
             if (newValue < 0 && this.monsterHealth < 0) {
 
-                // Draw
                 this.winner = 'draw';
 
             } else if (newValue < 0) {
 
-                // You Lost
                 this.winner = 'monster';
             }
 
@@ -33,12 +32,10 @@ const app = Vue.createApp({
 
             if (newValue < 0 && this.playerHealth < 0) {
 
-                // Draw
                 this.winner = 'draw';
 
             } else if (newValue < 0) {
 
-                // You Won
                 this.winner = 'player';
 
             }
@@ -48,20 +45,28 @@ const app = Vue.createApp({
 
     computed: {
         monsterBarStyles() {
+            if (this.monsterHealth < 0) {
+                return {
+                    width: '0%'
+                }
+            }
+
             return {
                 width: this.monsterHealth + '%'
             }
         },
 
         playerBarStyles() {
+            if (this.playerHealth < 0) {
+                return {
+                    width: '0%'
+                }
+            }
+
             return {
                 width: this.playerHealth + '%'
             }
         },
-
-        endGame() {
-            return
-        }
     },
 
     methods: {
@@ -75,6 +80,8 @@ const app = Vue.createApp({
 
             this.monsterAttack();
 
+            this.addLogMessages('player', 'attacks', damageDealt);
+
         },
 
         monsterAttack() {
@@ -82,6 +89,8 @@ const app = Vue.createApp({
             const damageDealt = randomIntFromInterval(7, 10);
 
             this.playerHealth -= damageDealt;
+
+            this.addLogMessages('monster', 'attacks', damageDealt);
 
         },
 
@@ -94,6 +103,8 @@ const app = Vue.createApp({
             this.monsterHealth -= damageDealt;
 
             this.monsterAttack();
+
+            this.addLogMessages('player', 'special-attack', damageDealt);
 
         },
 
@@ -113,7 +124,11 @@ const app = Vue.createApp({
 
                 }
 
+                this.monsterAttack();
+
                 this.roundCount = 0;
+
+                this.addLogMessages('player', 'heal', healAmount);
 
             }
 
@@ -123,8 +138,24 @@ const app = Vue.createApp({
 
         surrender() {
 
-            window.alert('Shameless Surrender');
+            this.winner = 'monster';
 
+        },
+
+        restart() {
+            this.monsterHealth = 100;
+            this.playerHealth = 100;
+            this.roundCount = 0;
+            this.winner = null;
+            this.logMessages = [];
+        },
+
+        addLogMessages(who, action, value) {
+            this.logMessages.unshift({
+                actionBy: who,
+                actionType: action,
+                value: value
+            });
         }
 
     }

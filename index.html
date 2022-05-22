@@ -21,14 +21,14 @@
       <section id="monster" class="container">
         <h2>Monster Health</h2>
         <div class="healthbar">
-          <div class="healthbar__value" :style="monsterBarStyles">{{ monsterHealth }}</div>
+          <div class="healthbar__value" :style="monsterBarStyles"></div>
         </div>
       </section>
 
       <section id="player" class="container">
         <h2>Your Health</h2>
         <div class="healthbar">
-          <div class="healthbar__value" :style="playerBarStyles">{{ playerHealth }}</div>
+          <div class="healthbar__value" :style="playerBarStyles"></div>
         </div>
       </section>
 
@@ -38,9 +38,11 @@
         <h3 v-if="winner ==='player'">You Won!</h3>
         <h3 v-else-if="winner === 'monster'">You Lost!</h3>
         <h3 v-else>Draw</h3>
+
+        <button @click="restart">Play Again</button>
       </section>
 
-      <section id="controls">
+      <section v-else id="controls">
         <button @click="attackMonster">ATTACK</button>
         <button @click="specialAttack">SPECIAL ATTACK</button>
         <button @click="heal">HEAL</button>
@@ -49,9 +51,25 @@
 
       <section id="log" class="container">
         <h2>Battle Log</h2>
-        <ul></ul>
-      </section>
+        <ul>
+          <li v-for="(log, index) in logMessages" :key="index">
+            <!-- Action By: -->
+            <span :class="{
+              'log--player': log.actionBy === 'player',
+              'log--monster': log.actionBy === 'monster'
+            }">{{ log.actionBy === 'monster' ? 'Monster' : 'Player' }}</span>
 
+            <!-- Action Type: -->
+            <span v-if="log.actionType === 'heal'" class="log--heal"> heals </span>
+            <span v-else-if="log.actionType === 'special-attack'" class="log--damage"> special attacks </span>
+            <span v-else class="log--damage"> attacks </span>
+
+            <!-- Value: -->
+            <span> {{ log.value }}</span>
+          </li>
+
+        </ul>
+      </section>
     </div>
   </body>
 </html>
